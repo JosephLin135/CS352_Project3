@@ -1,0 +1,69 @@
+no cookie base valid login cases - sucess
+-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=bezos&password=amazon http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=naiveuser&password=password123 http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=srinivas&password=nicetry http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+no cookie login tests with different inputs - bad cred
+curl -X POST -d username=&password= http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=bezos&password= http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=&password=amazon http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=aaa&password=bbb http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+valid cookie testing
+curl -c cookies.txt -X POST -d username=bezos&password=amazon http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl -b cookies.txt -X POST -d username=&password= http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl -b cookies.txt -X POST -d username=bezos&password= http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl -b cookies.txt -X POST -d username=bezos&password=aaa http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl -b cookies.txt -X POST -d username=&password=amazon http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl -b cookies.txt -X POST -d username=wow&password=amazon http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl -b cookies.txt -X POST -d username=wow&password=yay http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+invalid cookie testing
+-e 
+------------------------------------------------------------------------------------
+curl --cookie token=0 -X POST -d username=&password= http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl --cookie token=0 -X POST -d username=bezos&password= http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl --cookie token=0 -X POST -d username=&password=amazon http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl --cookie token=0 -X POST -d username=bezos&password=bezos http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+logout testing
+curl -b cookies.txt -X POST -d action=logout http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------
+curl --cookie token=0 -X POST -d action=logout http://localhost:8000/
+-e 
+------------------------------------------------------------------------------------

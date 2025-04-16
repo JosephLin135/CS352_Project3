@@ -2,14 +2,15 @@ import socket
 import signal
 import sys
 import random
+import urllib.parse
 
-# Read a command line argument for the port where the server
-# must run.
+# Default server port
 port = 8080
 if len(sys.argv) > 1:
     port = int(sys.argv[1])
 else:
     print("Using default port 8080")
+
 hostname = socket.gethostname()
 
 # Start a listening server socket on the port
@@ -17,8 +18,7 @@ sock = socket.socket()
 sock.bind(('', port))
 sock.listen(2)
 
-### Contents of pages we will serve.
-# Login form
+# Contents of pages to be served
 login_form = """
    <form action = "http://%s" method = "post">
    Name: <input type = "text" name = "username">  <br/>
@@ -26,14 +26,9 @@ login_form = """
    <input type = "submit" value = "Submit" />
    </form>
 """
-# Default: Login page.
 login_page = "<h1>Please login</h1>" + login_form
-# Error page for bad credentials
 bad_creds_page = "<h1>Bad user/pass! Try again</h1>" + login_form
-# Successful logout
 logout_page = "<h1>Logged out successfully</h1>" + login_form
-# A part of the page that will be displayed after successful
-# login or the presentation of a valid cookie
 success_page = """
    <h1>Welcome!</h1>
    <form action="http://%s" method = "post">
@@ -44,86 +39,156 @@ success_page = """
    <h1>Your secret data is here:</h1>
 """
 
-#### Helper functions
-# Printing.
+# Helper functions
 def print_value(tag, value):
-    print("Here is the", tag)
-    print("\"\"\"")
+    print(f"Here is the {tag}")
+    print('"""')
     print(value)
-    print("\"\"\"")
+    print('"""')
     print()
 
-# Signal handler for graceful exit
 def sigint_handler(sig, frame):
     print('Finishing up by closing listening socket...')
     sock.close()
     sys.exit(0)
-# Register the signal handler
+
+# Register the signal handler for graceful exit
 signal.signal(signal.SIGINT, sigint_handler)
 
+# Load user credentials and secrets
+user_credentials = {}
+user_secrets = {}
 
-# TODO: put your application logic here!
-# Read login credentials for all the users
-# Read secret data of all the users
+def load_file_data():
+    try:
+        with open('passwords.txt', 'r') as f:
+            for line in f:
+                parts = line.strip().split(' ', 1)
+                if len(parts) == 2:
+                    username, password = parts
+                    user_credentials[username] = password
+    except FileNotFoundError:
+        print("Warning: passwords.txt file not found!")
 
+    try:
+        with open('secrets.txt', 'r') as f:
+            for line in f:
+                parts = line.strip().split(' ', 1)
+                if len(parts) == 2:
+                    username, secret = parts
+                    user_secrets[username] = secret
+    except FileNotFoundError:
+        print("Warning: secrets.txt file not found!")
 
+load_file_data()
 
+# Store active user cookies
+cookie_to_username = {}
 
-### Loop to accept incoming HTTP connections and respond.
+def parse_form_data(data):
+    result = {}
+    if not data:
+        return result
+    
+    pairs = data.split('&')
+    for pair in pairs:
+        if '=' in pair:
+            key, value = pair.split('=', 1)
+            key = urllib.parse.unquote_plus(key)
+            value = urllib.parse.unquote_plus(value)
+            result[key] = value
+    return result
+
+def extract_cookie_value(headers):
+    header_lines = headers.split('\r\n')
+    for line in header_lines:
+        if line.startswith('Cookie:'):
+            cookie_str = line[len('Cookie:'):].strip()
+            cookie_pairs = cookie_str.split('; ')
+            for pair in cookie_pairs:
+                if pair.startswith('token='):
+                    return pair[len('token='):]
+    return None
+
+# Start the server loop to accept incoming HTTP connections
 while True:
     client, addr = sock.accept()
     req = client.recv(1024)
 
-    # Let's pick the headers and entity body apart
+    # Parse the headers and body from the request
     header_body = req.decode().split('\r\n\r\n')
     headers = header_body[0]
     body = '' if len(header_body) == 1 else header_body[1]
+    
+    # Log headers and body for debugging
     print_value('headers', headers)
     print_value('entity body', body)
 
-    # TODO: Put your application logic here!
-    # Parse headers and body and perform various actions
+    form_data = parse_form_data(body)
+    cookie_value = extract_cookie_value(headers)
 
-    # OPTIONAL TODO:
-    # Set up the port/hostname for the form's submit URL.
-    # If you want POSTing to your server to
-    # work even when the server and client are on different
-    # machines, the form submit URL must reflect the `Host:`
-    # header on the request.
-    # Change the submit_hostport variable to reflect this.
-    # This part is optional, and might even be fun.
-    # By default, as set up below, POSTing the form will
-    # always send the request to the domain name returned by
-    # socket.gethostname().
-    submit_hostport = "%s:%d" % (hostname, port)
-
-    # You need to set the variables:
-    # (1) `html_content_to_send` => add the HTML content you'd
-    # like to send to the client.
-    # Right now, we just send the default login page.
-    html_content_to_send = login_page % submit_hostport
-    # But other possibilities exist, including
-    # html_content_to_send = (success_page % submit_hostport) + <secret>
-    # html_content_to_send = bad_creds_page % submit_hostport
-    # html_content_to_send = logout_page % submit_hostport
-    
-    # (2) `headers_to_send` => add any additional headers
-    # you'd like to send the client?
-    # Right now, we don't send any extra headers.
+    # Initialize response variables
+    html_content_to_send = ''
     headers_to_send = ''
 
-    # Construct and send the final response
-    response  = 'HTTP/1.1 200 OK\r\n'
+    # Set up the port/hostname for the form's submit URL
+    submit_hostport = f"{hostname}:{port}"
+    for line in headers.split('\r\n'):
+        if line.startswith('Host:'):
+            submit_hostport = line[len('Host:'):].strip()
+            break
+
+    # Process different actions based on the request
+    if 'action' in form_data and form_data['action'] == 'logout':
+        # Case E: Logout request
+        headers_to_send = 'Set-Cookie: token=; expires=Thu, 01 Jan 1970 00:00:00 GMT\r\n'
+        html_content_to_send = logout_page % submit_hostport
+    
+    elif cookie_value and cookie_value in cookie_to_username:
+        # Case C: Valid cookie present
+        username = cookie_to_username[cookie_value]
+        secret = user_secrets.get(username, 'No secret available')
+        html_content_to_send = (success_page % submit_hostport) + secret
+    
+    elif cookie_value and cookie_value not in cookie_to_username:
+        # Case D: Invalid cookie present
+        html_content_to_send = bad_creds_page % submit_hostport
+    
+    elif 'username' in form_data and 'password' in form_data:
+        # Case A & B: Username/password authentication
+        username = form_data['username']
+        password = form_data['password']
+        
+        if username in user_credentials and user_credentials[username] == password:
+            # Case A: Valid credentials
+            rand_val = random.getrandbits(64)
+            cookie_value = str(rand_val)
+            cookie_to_username[cookie_value] = username
+            headers_to_send = f'Set-Cookie: token={cookie_value}\r\n'
+            secret = user_secrets.get(username, 'No secret available')
+            html_content_to_send = (success_page % submit_hostport) + secret
+        else:
+            # Case B: Invalid credentials
+            html_content_to_send = bad_creds_page % submit_hostport
+    
+    else:
+        # Default case: Show login page
+        html_content_to_send = login_page % submit_hostport
+
+    # Construct and send the final HTTP response
+    response = 'HTTP/1.1 200 OK\r\n'
     response += headers_to_send
     response += 'Content-Type: text/html\r\n\r\n'
     response += html_content_to_send
+    
+    # Send response to the client
     print_value('response', response)    
     client.send(response.encode())
     client.close()
-    
+
     print("Served one request/connection!")
     print()
 
-# We will never actually get here.
-# Close the listening socket
+# This code will never actually be reached since we have an infinite loop.
+# Close the listening socket when exiting
 sock.close()

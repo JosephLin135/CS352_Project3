@@ -10,7 +10,10 @@ echo curl -X POST -d "username=srinivas&password=nicetry" http://localhost:8000/
 curl -X POST -d "username=srinivas&password=nicetry" http://localhost:8000/
 echo -e "\n------------------------------------------------------------------------------------"
 
-echo no cookie login tests with different inputs - bad cred 
+echo no cookie login tests with different inputs
+echo curl -X POST -d "" http://localhost:8000/
+curl -X POST -d "" http://localhost:8000/
+echo -e "\n------------------------------------------------------------------------------------"
 echo curl -X POST -d "username=&password=" http://localhost:8000/
 curl -X POST -d "username=&password=" http://localhost:8000/
 echo -e "\n------------------------------------------------------------------------------------"

@@ -160,6 +160,9 @@ while True:
     if body == 'action=logout':
         print("Logout")
         response = logoutPageTemplate()
+    elif username == None and password == None and cookie == None:
+        print("Base login")
+        response = loginPageTemplate()
     elif username in credentialsDict.keys() and password == credentialsDict[username]:
         print("Valid credentials")
         if cookie == None or cookie in cookieDict.keys():

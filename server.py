@@ -5,11 +5,11 @@ import random
 import urllib.parse
 
 # Default server port
-port = 8080
+port = 8000
 if len(sys.argv) > 1:
     port = int(sys.argv[1])
 else:
-    print("Using default port 8080")
+    print("Using default port 8000")
 
 hostname = socket.gethostname()
 

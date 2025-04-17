@@ -1,0 +1,218 @@
+no cookie base valid login cases - sucess
+-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=bezos&password=amazon http://localhost:8000/
+
+   <h1>Welcome!</h1>
+   <form action="http://localhost:8000" method = "post">
+   <input type = "hidden" name = "action" value = "logout" />
+   <input type = "submit" value = "Click here to logout" />
+   </form>
+   <br/><br/>
+   <h1>Your secret data is here:</h1>
+kaching-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=naiveuser&password=password123 http://localhost:8000/
+
+   <h1>Welcome!</h1>
+   <form action="http://localhost:8000" method = "post">
+   <input type = "hidden" name = "action" value = "logout" />
+   <input type = "submit" value = "Click here to logout" />
+   </form>
+   <br/><br/>
+   <h1>Your secret data is here:</h1>
+mymostsecretpassword-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=srinivas&password=nicetry http://localhost:8000/
+
+   <h1>Welcome!</h1>
+   <form action="http://localhost:8000" method = "post">
+   <input type = "hidden" name = "action" value = "logout" />
+   <input type = "submit" value = "Click here to logout" />
+   </form>
+   <br/><br/>
+   <h1>Your secret data is here:</h1>
+nothingtoseehere-e 
+------------------------------------------------------------------------------------
+no cookie login tests with different inputs
+curl -X POST -d  http://localhost:8000/
+<h1>Please login</h1>
+   <form action = "http://localhost:8000" method = "post">
+   Name: <input type = "text" name = "username">  <br/>
+   Password: <input type = "text" name = "password" /> <br/>
+   <input type = "submit" value = "Submit" />
+   </form>
+-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=&password= http://localhost:8000/
+<h1>Bad user/pass! Try again</h1>
+   <form action = "http://localhost:8000" method = "post">
+   Name: <input type = "text" name = "username">  <br/>
+   Password: <input type = "text" name = "password" /> <br/>
+   <input type = "submit" value = "Submit" />
+   </form>
+-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=bezos&password= http://localhost:8000/
+<h1>Bad user/pass! Try again</h1>
+   <form action = "http://localhost:8000" method = "post">
+   Name: <input type = "text" name = "username">  <br/>
+   Password: <input type = "text" name = "password" /> <br/>
+   <input type = "submit" value = "Submit" />
+   </form>
+-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=&password=amazon http://localhost:8000/
+<h1>Bad user/pass! Try again</h1>
+   <form action = "http://localhost:8000" method = "post">
+   Name: <input type = "text" name = "username">  <br/>
+   Password: <input type = "text" name = "password" /> <br/>
+   <input type = "submit" value = "Submit" />
+   </form>
+-e 
+------------------------------------------------------------------------------------
+curl -X POST -d username=aaa&password=bbb http://localhost:8000/
+<h1>Bad user/pass! Try again</h1>
+   <form action = "http://localhost:8000" method = "post">
+   Name: <input type = "text" name = "username">  <br/>
+   Password: <input type = "text" name = "password" /> <br/>
+   <input type = "submit" value = "Submit" />
+   </form>
+-e 
+------------------------------------------------------------------------------------
+valid cookie testing
+curl -c cookies.txt -X POST -d username=bezos&password=amazon http://localhost:8000/
+
+   <h1>Welcome!</h1>
+   <form action="http://localhost:8000" method = "post">
+   <input type = "hidden" name = "action" value = "logout" />
+   <input type = "submit" value = "Click here to logout" />
+   </form>
+   <br/><br/>
+   <h1>Your secret data is here:</h1>
+kaching-e 
+------------------------------------------------------------------------------------
+curl -b cookies.txt -X POST -d username=&password= http://localhost:8000/
+
+   <h1>Welcome!</h1>
+   <form action="http://localhost:8000" method = "post">
+   <input type = "hidden" name = "action" value = "logout" />
+   <input type = "submit" value = "Click here to logout" />
+   </form>
+   <br/><br/>
+   <h1>Your secret data is here:</h1>
+kaching-e 
+------------------------------------------------------------------------------------
+curl -b cookies.txt -X POST -d username=bezos&password= http://localhost:8000/
+
+   <h1>Welcome!</h1>
+   <form action="http://localhost:8000" method = "post">
+   <input type = "hidden" name = "action" value = "logout" />
+   <input type = "submit" value = "Click here to logout" />
+   </form>
+   <br/><br/>
+   <h1>Your secret data is here:</h1>
+kaching-e 
+------------------------------------------------------------------------------------
+curl -b cookies.txt -X POST -d username=bezos&password=aaa http://localhost:8000/
+
+   <h1>Welcome!</h1>
+   <form action="http://localhost:8000" method = "post">
+   <input type = "hidden" name = "action" value = "logout" />
+   <input type = "submit" value = "Click here to logout" />
+   </form>
+   <br/><br/>
+   <h1>Your secret data is here:</h1>
+kaching-e 
+------------------------------------------------------------------------------------
+curl -b cookies.txt -X POST -d username=&password=amazon http://localhost:8000/
+
+   <h1>Welcome!</h1>
+   <form action="http://localhost:8000" method = "post">
+   <input type = "hidden" name = "action" value = "logout" />
+   <input type = "submit" value = "Click here to logout" />
+   </form>
+   <br/><br/>
+   <h1>Your secret data is here:</h1>
+kaching-e 
+------------------------------------------------------------------------------------
+curl -b cookies.txt -X POST -d username=wow&password=amazon http://localhost:8000/
+
+   <h1>Welcome!</h1>
+   <form action="http://localhost:8000" method = "post">
+   <input type = "hidden" name = "action" value = "logout" />
+   <input type = "submit" value = "Click here to logout" />
+   </form>
+   <br/><br/>
+   <h1>Your secret data is here:</h1>
+kaching-e 
+------------------------------------------------------------------------------------
+curl -b cookies.txt -X POST -d username=wow&password=yay http://localhost:8000/
+
+   <h1>Welcome!</h1>
+   <form action="http://localhost:8000" method = "post">
+   <input type = "hidden" name = "action" value = "logout" />
+   <input type = "submit" value = "Click here to logout" />
+   </form>
+   <br/><br/>
+   <h1>Your secret data is here:</h1>
+kaching-e 
+------------------------------------------------------------------------------------
+invalid cookie testing
+-e 
+------------------------------------------------------------------------------------
+curl --cookie token=0 -X POST -d username=&password= http://localhost:8000/
+<h1>Bad user/pass! Try again</h1>
+   <form action = "http://localhost:8000" method = "post">
+   Name: <input type = "text" name = "username">  <br/>
+   Password: <input type = "text" name = "password" /> <br/>
+   <input type = "submit" value = "Submit" />
+   </form>
+-e 
+------------------------------------------------------------------------------------
+curl --cookie token=0 -X POST -d username=bezos&password= http://localhost:8000/
+<h1>Bad user/pass! Try again</h1>
+   <form action = "http://localhost:8000" method = "post">
+   Name: <input type = "text" name = "username">  <br/>
+   Password: <input type = "text" name = "password" /> <br/>
+   <input type = "submit" value = "Submit" />
+   </form>
+-e 
+------------------------------------------------------------------------------------
+curl --cookie token=0 -X POST -d username=&password=amazon http://localhost:8000/
+<h1>Bad user/pass! Try again</h1>
+   <form action = "http://localhost:8000" method = "post">
+   Name: <input type = "text" name = "username">  <br/>
+   Password: <input type = "text" name = "password" /> <br/>
+   <input type = "submit" value = "Submit" />
+   </form>
+-e 
+------------------------------------------------------------------------------------
+curl --cookie token=0 -X POST -d username=bezos&password=bezos http://localhost:8000/
+<h1>Bad user/pass! Try again</h1>
+   <form action = "http://localhost:8000" method = "post">
+   Name: <input type = "text" name = "username">  <br/>
+   Password: <input type = "text" name = "password" /> <br/>
+   <input type = "submit" value = "Submit" />
+   </form>
+-e 
+------------------------------------------------------------------------------------
+logout testing
+curl -b cookies.txt -X POST -d action=logout http://localhost:8000/
+<h1>Logged out successfully</h1>
+   <form action = "http://localhost:8000" method = "post">
+   Name: <input type = "text" name = "username">  <br/>
+   Password: <input type = "text" name = "password" /> <br/>
+   <input type = "submit" value = "Submit" />
+   </form>
+-e 
+------------------------------------------------------------------------------------
+curl --cookie token=0 -X POST -d action=logout http://localhost:8000/
+<h1>Logged out successfully</h1>
+   <form action = "http://localhost:8000" method = "post">
+   Name: <input type = "text" name = "username">  <br/>
+   Password: <input type = "text" name = "password" /> <br/>
+   <input type = "submit" value = "Submit" />
+   </form>
+-e 
+------------------------------------------------------------------------------------
